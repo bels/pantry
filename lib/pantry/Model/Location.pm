@@ -1,4 +1,4 @@
-package pantry::Model::Item;
+package pantry::Model::Location;
 use Mojo::Base -base, -signatures;
 
 use Role::Tiny::With;
@@ -12,8 +12,7 @@ has 'id';
 has 'genesis';
 has 'modified';
 has 'name';
-has 'amount';
-has 'location';
+has 'description';
 has 'active';
 
 1;
