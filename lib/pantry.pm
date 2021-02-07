@@ -1,5 +1,6 @@
 package pantry;
 use Mojo::Base 'Mojolicious', -signatures;
+use Mojo::SQLite;
 
 # This method will run once at server start
 sub startup ($self) {
@@ -9,7 +10,12 @@ sub startup ($self) {
 	
 	# Configure the application
 	$self->secrets($config->{secrets});
-	
+
+	$self->helper(sql => sub{
+		my $self = shift;
+		state $sql = Mojo::SQLite->new('sqlite:pantry.db');
+	});
+
 	# Router
 	my $r = $self->routes;
 	
