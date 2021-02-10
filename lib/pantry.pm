@@ -2,6 +2,11 @@ package pantry;
 use Mojo::Base 'Mojolicious', -signatures;
 use Mojo::SQLite;
 
+use pantry::Model::Item;
+use pantry::Model::ItemType;
+use pantry::Model::Location;
+use pantry::Model::Recipe;
+
 # This method will run once at server start
 sub startup ($self) {
 
@@ -16,21 +21,38 @@ sub startup ($self) {
 		state $sql = Mojo::SQLite->new('sqlite:pantry.db');
 	});
 
+	$self->helper(item => sub{
+		my $self = shift;
+		state $item = pantry::Model::Item->new(db => $self->db);
+	});
+	$self->helper(item_type => sub{
+		my $self = shift;
+		state $item_type = pantry::Model::ItemType->new(db => $self->db);
+	});
+	$self->helper(location => sub{
+		my $self = shift;
+		state $location = pantry::Model::Location->new(db => $self->db);
+	});
+	$self->helper(recipe => sub{
+		my $self = shift;
+		state $recipe = pantry::Model::Recipe->new(db => $self->db);
+	});
 	# Router
 	my $r = $self->routes;
 	
 	# Normal route to controller
-	
+
+	$r->get('/item/types')->to(controller => 'generic', action => 'getAll', object => 'item_type', render_type => 'json', predicate => undef)->name('get_item_types');
 	$r->get('/item/:id')->to(controller => 'generic', action => 'getOne', object => 'item', render_type => 'json', predicate => undef)->name('get_item');
 	$r->put('/item/:id')->to(controller => 'generic', action => 'update', object => 'item', render_type => 'json', predicate => undef)->name('update_item');
 	$r->delete('/item/:id')->to(controller => 'generic', action => 'delete', object => 'item', render_type => 'json')->name('delete_item');
 	$r->get('/items')->to(controller => 'generic', action => 'getAll', object => 'item', render_type => 'json', predicate => undef)->name('get_all_items');
 	$r->post('/item')->to(controller => 'generic', action => 'create', object => 'item', render_type => 'json')->name('create_item');
 	
-	$r->get('/recipe/:id/items')->to(controller => 'generic', action => 'getAll', object => 'item', render_type => 'json', qualifier => 'recipe', predicate => undef)->name('get_recipe_items');
+	$r->get('/recipe/:id/items')->to(controller => 'generic', action => 'getAll', object => 'recipe', render_type => 'json', qualifier => 'recipe', predicate => undef)->name('get_recipe_items');
 	$r->get('/recipe/:id')->to(controller => 'generic', action => 'getOne', object => 'recipe', render_type => 'json', predicate => undef)->name('get_recipe');
 	$r->put('/recipe/:id')->to(controller => 'generic', action => 'update', object => 'recipe', render_type => 'json', predicate => undef)->name('update_recipe');
-	$r->delete('/recipe/:id')->to(controller => 'generic', action => 'delete', object => 'item', render_type => 'json')->name('delete_item');
+	$r->delete('/recipe/:id')->to(controller => 'generic', action => 'delete', object => 'recipe', render_type => 'json')->name('delete_item');
 	$r->get('/recipes')->to(controller => 'generic', action => 'getAll', object => 'recipe', render_type => 'json', predicate => undef)->name('get_all_recipes');
 	$r->post('/recipe')->to(controller => 'generic', action => 'create', object => 'recipe', render_type => 'json', predicate => undef)->name('create_recipe');
 	

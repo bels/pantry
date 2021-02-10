@@ -1,10 +1,10 @@
-package pantry::Model::Recipe;
+package pantry::Model::ItemType;
 use Mojo::Base -base, -signatures;
 
 use Role::Tiny::With;
 
 has 'db';
-has 'table' => 'recipe';
+has 'table' => 'item_type';
 
 with 'pantry::Role::CRUD', 'pantry::Role::LoadObject';
 
@@ -12,6 +12,6 @@ has 'id';
 has 'genesis';
 has 'modified';
 has 'name';
-has 'items';
+has 'active';
 
 1;

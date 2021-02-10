@@ -3,7 +3,7 @@ use Mojo::Base -base, -signatures;
 
 use Role::Tiny::With;
 
-has 'pg';
+has 'db';
 has 'table' => 'item';
 
 with 'pantry::Role::CRUD', 'pantry::Role::LoadObject';

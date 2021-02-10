@@ -1,7 +1,7 @@
 package pantry::Role::CRUD;
 use Mojo::Base -role, -signatures;
 
-requires 'pg';
+requires 'db';
 requires 'table';
 
 
