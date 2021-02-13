@@ -29,25 +29,39 @@ sub startup ($self) {
 
 	$self->helper(item => sub{
 		my $self = shift;
-		state $item = pantry::Model::Item->new(db => $self->db);
+		state $item = pantry::Model::Item->new(sql => $self->sql);
 	});
 	$self->helper(item_type => sub{
 		my $self = shift;
-		state $item_type = pantry::Model::ItemType->new(db => $self->db);
+		state $item_type = pantry::Model::ItemType->new(sql => $self->sql);
 	});
 	$self->helper(location => sub{
 		my $self = shift;
-		state $location = pantry::Model::Location->new(db => $self->db);
+		state $location = pantry::Model::Location->new(sql => $self->sql);
 	});
 	$self->helper(recipe => sub{
 		my $self = shift;
-		state $recipe = pantry::Model::Recipe->new(db => $self->db);
+		state $recipe = pantry::Model::Recipe->new(sql => $self->sql);
 	});
 	# Router
 	my $r = $self->routes;
 	
 	# Normal route to controller
 
+	$r->options('/*' => sub{
+		#allowing cors
+		my $self = shift;
+		my $origin = $self->req->headers->origin;
+	
+		$self->res->headers->header('Access-Control-Allow-Origin' => $origin);
+		$self->res->headers->header('Access-Control-Allow-Credentials' => 'true');
+		$self->res->headers->header('Access-Control-Allow-Methods' => 'GET, OPTIONS, POST, DELETE, PUT');
+		$self->res->headers->header('Access-Control-Allow-Headers' => 'Content-Type');
+		#$self->res->headers->header('Access-Control-Max-Age' => '1728000');                                                                                                                              
+	
+		$self->respond_to(any => { data => '', status => 200 });
+	});
+	$r->post('/item/type')->to(controller => 'generic', action => 'create', object => 'item_type', render_type => 'json', predicate => undef)->name('create_item_type');
 	$r->get('/item/types')->to(controller => 'generic', action => 'getAll', object => 'item_type', render_type => 'json', predicate => undef)->name('get_item_types');
 	$r->get('/item/:id')->to(controller => 'generic', action => 'getOne', object => 'item', render_type => 'json', predicate => undef)->name('get_item');
 	$r->put('/item/:id')->to(controller => 'generic', action => 'update', object => 'item', render_type => 'json', predicate => undef)->name('update_item');
