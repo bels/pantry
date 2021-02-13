@@ -1,15 +1,22 @@
 -- 1 up
 
-CREATE TABLE item_type(
+CREATE TABLE recipe(
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	genesis TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	modified TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	name TEXT NOT NULL,
+	description TEXT,
 	active BOOLEAN NOT NULL CHECK (active IN (0,1))
 );
 
-
+CREATE TABLE recipe_items(
+	item INTEGER,
+	recipe INTEGER,
+	FOREIGN KEY(item) REFERENCES item(id),
+	FOREIGN KEY(recipe) REFERENCES recipe(id)
+);
 
 -- 1 down
 
-DROP TABLE item_type;
+DROP TABLE recipe;
+DROP TABLE recipe_items;

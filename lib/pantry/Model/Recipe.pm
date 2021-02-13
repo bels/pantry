@@ -12,6 +12,7 @@ has 'id';
 has 'genesis';
 has 'modified';
 has 'name';
+has 'description';
 has 'items';
 
 1;

@@ -1,0 +1,4 @@
+pantry.db
+node_modules/*
+pantry.db-shm
+pantry.db-wal

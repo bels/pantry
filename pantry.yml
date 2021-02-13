@@ -3,3 +3,6 @@ secrets:
   - 1e03318a7493ca9ab66ac44579d2d53816203ff8
 migration_files:
   - migrations/item_type.sql
+  - migrations/location.sql
+  - migrations/item.sql
+  - migrations/recipe.sql
