@@ -6,7 +6,7 @@ CREATE TABLE location(
 	modified TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	name TEXT NOT NULL,
 	description TEXT,
-	active BOOLEAN NOT NULL CHECK (active IN (0,1))
+	active BOOLEAN NOT NULL CHECK (active IN (0,1)) DEFAULT 1
 );
 
 -- 1 down

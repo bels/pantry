@@ -8,7 +8,7 @@ CREATE TABLE item(
 	type INTEGER NOT NULL,
 	amount REAL NOT NULL DEFAULT 0,
 	location INTEGER,
-	active BOOLEAN NOT NULL CHECK (active IN (0,1)),
+	active BOOLEAN NOT NULL CHECK (active IN (0,1)) DEFAULT 1,
 	FOREIGN KEY(type) REFERENCES item_type(id),
 	FOREIGN KEY(location) REFERENCES location(id)
 );
