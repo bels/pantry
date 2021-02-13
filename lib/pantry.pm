@@ -21,6 +21,12 @@ sub startup ($self) {
 		state $sql = Mojo::SQLite->new('sqlite:pantry.db');
 	});
 
+	foreach my $migration_file (@{$self->config('migration_files')}){
+		my $name = $migration_file;
+		$name =~ s/\.sql//;
+		$self->sql->auto_migrate(1)->migrations->name($name)->from_file($migration_file)->migrate;
+	}
+
 	$self->helper(item => sub{
 		my $self = shift;
 		state $item = pantry::Model::Item->new(db => $self->db);
