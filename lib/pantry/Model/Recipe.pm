@@ -1,18 +1,17 @@
 package pantry::Model::Recipe;
-use Mojo::Base -base, -signatures;
 
-use Role::Tiny::With;
+use Moose;
 
-has 'sql';
-has 'table' => 'recipe';
+has 'sql' => (is => 'rw', isa => 'Mojo::SQLite');
+has 'table' => (is => 'ro', isa => 'Str', default => 'recipe');
 
-with 'pantry::Role::CRUD', 'pantry::Role::LoadObject';
+with 'pantry::Role::CRUD', 'pantry::Role::LoadObject', 'pantry::Role::JSON';
 
-has 'id';
-has 'genesis';
-has 'modified';
-has 'name';
-has 'description';
-has 'items';
+has 'id' => (is => 'rw', isa => 'Maybe[Str]');
+has 'genesis' => (is => 'rw', isa => 'Maybe[Str]');
+has 'modified' => (is => 'rw', isa => 'Maybe[Str]');
+has 'name' => (is => 'rw', isa => 'Maybe[Str]');
+has 'description' => (is => 'rw', isa => 'Maybe[Str]');
+has 'items' => (is => 'rw', isa => 'Maybe[ArrayRef]');
 
 1;

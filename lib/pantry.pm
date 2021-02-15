@@ -43,6 +43,16 @@ sub startup ($self) {
 		my $self = shift;
 		state $recipe = pantry::Model::Recipe->new(sql => $self->sql);
 	});
+
+	$self->hook(after_dispatch => sub{
+		my $self = shift;
+		my $origin = $self->req->headers->origin;
+	
+		$self->res->headers->header('Access-Control-Allow-Origin' => $origin);
+		#$self->res->headers->header('Access-Control-Allow-Credentials' => 'true');
+		#$self->res->headers->header('Access-Control-Allow-Methods' => 'GET, OPTIONS, POST, DELETE, PUT');
+		#$self->res->headers->header('Access-Control-Allow-Headers' => 'Content-Type');
+	});
 	# Router
 	my $r = $self->routes;
 	
@@ -56,7 +66,7 @@ sub startup ($self) {
 		$self->res->headers->header('Access-Control-Allow-Origin' => $origin);
 		$self->res->headers->header('Access-Control-Allow-Credentials' => 'true');
 		$self->res->headers->header('Access-Control-Allow-Methods' => 'GET, OPTIONS, POST, DELETE, PUT');
-		$self->res->headers->header('Access-Control-Allow-Headers' => 'Content-Type');
+		$self->res->headers->header('Access-Control-Allow-Headers' => 'Content-Type, Access-Control-Allow-Origin');
 		#$self->res->headers->header('Access-Control-Max-Age' => '1728000');                                                                                                                              
 	
 		$self->respond_to(any => { data => '', status => 200 });

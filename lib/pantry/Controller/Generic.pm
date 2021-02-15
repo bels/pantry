@@ -3,21 +3,26 @@ use Mojo::Base 'Mojolicious::Controller', -signatures;
 
 sub create($self){
 	my $object = $self->stash('object');
-	my $data = $self->$object->create($self->req->json);
-
-	if(!$data){
+	my $json = $self->req->json;
+	unless($self->$object->validate_json($json)){
 		return $self->reply->exception('Bad data');
-	} else {
-		if($self->stash('render_type') eq 'json' || !defined($self->stash('render_type'))){
-			$self->render(json => $data) and return;
-		}
-		if($self->stash('render_type') eq 'template'){
-			$self->render(template => $self->stash('template'), object => $data) and return;
-		}
-		if($self->stash('render_type') eq 'none'){
-			$self->stash(object => $data);
-		}
 	}
+	$self->$object->load_object($json);
+	$self->$object->create($json);
+
+	if($self->stash('render_type') eq 'json' || !defined($self->stash('render_type'))){
+		warn 'where I should be';
+		warn $self->dumper($self->$object);
+		$self->render(json => {test => 'test'});
+		$self->render(json => $self->$object) and return;
+	}
+	if($self->stash('render_type') eq 'template'){
+		$self->render(template => $self->stash('template'), object => $self->$object) and return;
+	}
+	if($self->stash('render_type') eq 'none'){
+		$self->stash(object => $self->$object);
+	}
+
 }
 
 sub update($self){

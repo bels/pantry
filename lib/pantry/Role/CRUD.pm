@@ -1,22 +1,27 @@
 package pantry::Role::CRUD;
-use Mojo::Base -role, -signatures;
+use Moose::Role;
 
-requires 'sql';
-requires 'table';
+use v5.20;
+use feature qw(signatures);
+no warnings qw(experimental::signatures);
+
+requires ('sql','table');
 
 
 sub create($self,$data){
 	return 'Setting table before use is required.' unless defined $self->table;
 
 	#return $self->sql->db->insert($self->table,$data,{returning => '*'})->hash; #returning is not supported in sqlite yet but it is coming
-	return $self->sql->db->insert($self->table,$data)->hash;
+	$self->sql->db->insert($self->table,$data);
+	return $self->sql->db->query('select * from ' . $self->table . ' order by genesis desc limit 1')->hash;
 }
 
 sub update($self,$id,$data){
 	return 'Setting table before use is required.' unless defined $self->table;
 
 	#return $self->sql->db->update($self->table,$data,{id => $id}, {returning => '*'})->hash;
-	return $self->sql->db->update($self->table,$data,{id => $id})->hash;
+	$self->sql->db->update($self->table,$data,{id => $id});
+	return $self->sql->db->select($self->table,undef,{id => $id})->hash;
 }
 
 sub getOne($self,$id,$predicate){
