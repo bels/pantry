@@ -3,7 +3,7 @@ package pantry::Model::Location;
 use Moose;
 
 has 'sql' => (is => 'rw', isa => 'Mojo::SQLite');
-has 'table' => (is => 'ro', isa => 'Str', default => 'item');
+has 'table' => (is => 'ro', isa => 'Str', default => 'location');
 
 with 'pantry::Role::CRUD', 'pantry::Role::LoadObject', 'pantry::Role::JSON';
 

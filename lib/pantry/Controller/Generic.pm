@@ -2,69 +2,67 @@ package pantry::Controller::Generic;
 use Mojo::Base 'Mojolicious::Controller', -signatures;
 
 sub create($self){
-	my $object = $self->stash('object');
+	my $object = $self->factory($self->stash('object'));
 	my $json = $self->req->json;
-	unless($self->$object->validate_json($json)){
+	unless($object->validate_json($json)){
 		return $self->reply->exception('Bad data');
 	}
-	$self->$object->load_object($json);
-	$self->$object->create($json);
+	$object->load_object($json);
+	$object->create($json); #TODO maybe add the ability to just call ->create
 
 	if($self->stash('render_type') eq 'json' || !defined($self->stash('render_type'))){
-		warn 'where I should be';
-		warn $self->dumper($self->$object);
 		$self->render(json => {test => 'test'});
-		$self->render(json => $self->$object) and return;
+		$self->render(json => $object) and return;
 	}
 	if($self->stash('render_type') eq 'template'){
-		$self->render(template => $self->stash('template'), object => $self->$object) and return;
+		$self->render(template => $self->stash('template'), object => $object) and return;
 	}
 	if($self->stash('render_type') eq 'none'){
-		$self->stash(object => $self->$object);
+		$self->stash(object => $object);
 	}
 
 }
 
 sub update($self){
-	my $object = $self->stash('object');
-	my $data = $self->object->update($self->param('id'),$self->req->json);
+	my $object = $self->factory($self->stash('object'));
+	my $data = $object->update($self->param('id'),$self->req->json);
 
 	if(!$data){
 		return $self->reply->exception('Bad data');
 	} else {
 		if($self->stash('render_type') eq 'json' || !defined($self->stash('render_type'))){
-			$self->render(json => $data) and return;
+			$self->render(json => $object) and return;
 		}
 		if($self->stash('render_type') eq 'template'){
-			$self->render(template => $self->stash('template'), object => $data) and return;
+			$self->render(template => $self->stash('template'), object => $object) and return;
 		}
 		if($self->stash('render_type') eq 'none'){
-			$self->stash(object => $data);
+			$self->stash(object => $object);
 		}
 	}
 }
 
 sub getOne($self){
-	my $object = $self->stash('object');
-	my $data = $self->$object->getOne($self->param('id'),$self->stash('predicte'));
+	my $object = $self->factory($self->stash('object'));
+	my $data = $object->getOne($self->param('id'),$self->stash('predicte'));
 
 	if(!$data){
 		return $self->reply->not_found();
 	} else {
 		if($self->stash('render_type') eq 'json' || !defined($self->stash('render_type'))){
-			$self->render(json => $data) and return;
+			$self->render(json => $object) and return;
 		}
 		if($self->stash('render_type') eq 'template'){
-			$self->render(template => $self->stash('template'), object => $data) and return;
+			$self->render(template => $self->stash('template'), object => $object) and return;
 		}
 		if($self->stash('render_type') eq 'none'){
-			$self->stash(object => $data);
+			$self->stash(object => $object);
 		}
 	}
 }
 
 sub getAll($self){
-	my $object = $self->stash('object');
+	my $object = $self->factory($self->stash('object'));
 	my $predicate = undef;
 	if($self->stash('qualifier')){
 		$predicate = {$self->stash('qualifier') => $self->param('id')};
@@ -74,19 +72,19 @@ sub getAll($self){
 		$predicate = {%{$predicate},%{$passed_predicate}};
 	}
 
-	my $data = $self->$object->getAll($predicate);
+	my $objects = $object->getAll($predicate);
 
-	if(!$data){
+	if(scalar @{$objects} == 0){
 		return $self->reply->not_found();
 	} else {
 		if($self->stash('render_type') eq 'json' || !defined($self->stash('render_type'))){
-			$self->render(json => $data) and return;
+			$self->render(json => $objects) and return;
 		}
 		if($self->stash('render_type') eq 'template'){
-			$self->render(template => $self->stash('template'), object => $data) and return;
+			$self->render(template => $self->stash('template'), object => $objects) and return;
 		}
 		if($self->stash('render_type') eq 'none'){
-			$self->stash(object => $data);
+			$self->stash(object => $objects);
 		}
 	}
 }
@@ -96,21 +94,21 @@ sub delete($self){
 		$self->reply->not_found();
 	}
 
-	my $object = $self->stash('object');
-	my $data = $self->$object->delete($self->param('id'));
+	my $object = $self->factory($self->stash('object'));
+	my $data = $object->delete($self->param('id'));
 
 	if(!$data){
 		return $self->reply->not_found();
 	} else {
 		unless($data->active){
 			if($self->stash('render_type') eq 'json' || !defined($self->stash('render_type'))){
-				$self->render(json => $data) and return;
+				$self->render(json => $object) and return;
 			}
 			if($self->stash('render_type') eq 'template'){
-				$self->render(template => $self->stash('template'), object => $data) and return;
+				$self->render(template => $self->stash('template'), object => $object) and return;
 			}
 			if($self->stash('render_type') eq 'none'){
-				$self->stash(object => $data);
+				$self->stash(object => $object);
 			}
 		} else {
 			#need handler for if it didn't "delete"

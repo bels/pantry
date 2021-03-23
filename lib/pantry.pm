@@ -27,21 +27,25 @@ sub startup ($self) {
 		$self->sql->auto_migrate(1)->migrations->name($name)->from_file($migration_file)->migrate;
 	}
 
-	$self->helper(item => sub{
-		my $self = shift;
-		state $item = pantry::Model::Item->new(sql => $self->sql);
-	});
-	$self->helper(item_type => sub{
-		my $self = shift;
-		state $item_type = pantry::Model::ItemType->new(sql => $self->sql);
-	});
-	$self->helper(location => sub{
-		my $self = shift;
-		state $location = pantry::Model::Location->new(sql => $self->sql);
-	});
-	$self->helper(recipe => sub{
-		my $self = shift;
-		state $recipe = pantry::Model::Recipe->new(sql => $self->sql);
+	$self->helper(factory => sub{
+		my ($self,$object_type) = @_;
+
+		my $objects = {
+			item => sub{
+				return pantry::Model::Item->new(sql => $self->sql);
+			},
+			item_type => sub{
+				return pantry::Model::ItemType->new(sql => $self->sql);
+			},
+			location => sub{
+				return pantry::Model::Location->new(sql => $self->sql);
+			},
+			recipe => sub{
+				return pantry::Model::Location->new(sql => $self->sql);
+			}
+		};
+
+		return $objects->{$object_type}();
 	});
 
 	$self->hook(after_dispatch => sub{
@@ -76,7 +80,7 @@ sub startup ($self) {
 	$r->get('/item/:id')->to(controller => 'generic', action => 'getOne', object => 'item', render_type => 'json', predicate => undef)->name('get_item');
 	$r->put('/item/:id')->to(controller => 'generic', action => 'update', object => 'item', render_type => 'json', predicate => undef)->name('update_item');
 	$r->delete('/item/:id')->to(controller => 'generic', action => 'delete', object => 'item', render_type => 'json')->name('delete_item');
-	$r->get('/items')->to(controller => 'generic', action => 'getAll', object => 'item', render_type => 'json', predicate => undef)->name('get_all_items');
+	$r->get('/items')->to(controller => 'generic', action => 'getAll', object => 'item', render_type => 'json', predicate => undef, render_type => 'json')->name('get_all_items');
 	$r->post('/item')->to(controller => 'generic', action => 'create', object => 'item', render_type => 'json')->name('create_item');
 	
 	$r->get('/recipe/:id/items')->to(controller => 'generic', action => 'getAll', object => 'recipe', render_type => 'json', qualifier => 'recipe', predicate => undef)->name('get_recipe_items');
@@ -88,7 +92,7 @@ sub startup ($self) {
 	
 	$r->get('/location/:id')->to(controller => 'generic', action => 'getOne', object => 'location', render_type => 'json', predicate => undef)->name('get_location');
 	$r->put('/location/:id')->to(controller => 'generic', action => 'update', object => 'location', render_type => 'json', predicate => undef)->name('update_location');
-	$r->delete('/location/:id')->to(controller => 'generic', action => 'delete', object => 'item', render_type => 'json')->name('delete_item');
+	$r->delete('/location/:id')->to(controller => 'generic', action => 'delete', object => 'location', render_type => 'json')->name('delete_item');
 	$r->get('/locations')->to(controller => 'generic', action => 'getAll', object => 'location', render_type => 'json', predicate => undef)->name('get_all_locations');
 	$r->post('/location')->to(controller => 'generic', action => 'create', object => 'location', render_type => 'json')->name('create_location');
 }
