@@ -50,8 +50,7 @@ sub getAll($self,$predicate){
 	} else {
 		$raw_objects = $self->sql->db->select($self->table)->hashes->to_array;
 	}
-use Data::Dumper;
-warn Dumper $raw_objects;
+
 	my $object_type = ref $self;
 	foreach my $raw (@{$raw_objects}){
 		push(@{$objects},$object_type->new($raw));

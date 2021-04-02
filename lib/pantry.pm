@@ -41,7 +41,7 @@ sub startup ($self) {
 				return pantry::Model::Location->new(sql => $self->sql);
 			},
 			recipe => sub{
-				return pantry::Model::Location->new(sql => $self->sql);
+				return pantry::Model::Recipe->new(sql => $self->sql);
 			}
 		};
 
